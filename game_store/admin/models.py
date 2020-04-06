@@ -4,7 +4,6 @@ from abc import ABCMeta, abstractmethod
 class SelectItem:
 
     def __init__(self, storage, field_name):
-
         self._storage = storage
         self._field_name = field_name
 
@@ -25,25 +24,22 @@ class BaseModel(metaclass=ABCMeta):
         self._primary_key = 0
 
     def __getattr__(self, item):
-
         if item in self.fields:
             return SelectItem(storage=self.storage, field_name=item)
 
         return self.__getattribute__(item)
 
     def insert(self, data):
-
         self.storage[self._primary_key] = data
         self._primary_key += 1
 
     def get_by_id(self, primary_key):
-
         return self.storage[primary_key]
 
 
 class Users(BaseModel):
-
-    _fields = {'name', 'surname', 'email'}
+    # todo store password hash instead of raw string
+    _fields = {'name', 'surname', 'email', 'is_active', 'password'}
 
     @property
     def storage(self):
@@ -56,4 +52,3 @@ class Users(BaseModel):
     def __init__(self):
         super().__init__()
         self._storage = {}
-
