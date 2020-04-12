@@ -34,4 +34,5 @@ def users_db(user_data):
 def test_select_by_email(users_db):
 
     user = users_db.email.fetchone(lambda x: x.startswith('lesya'))
+    print(user)
     assert user['surname'] == 'Ukrainka'

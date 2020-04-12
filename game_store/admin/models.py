@@ -8,11 +8,12 @@ class SelectItem:
         self._field_name = field_name
 
     def query(self, pred):
-
-        raise NotImplementedError
+        return [value
+                for value in self._storage.values()
+                if self._field_name in value
+                and pred(value[self._field_name])]
 
     def fetchone(self, pred):
-
         for item in self.query(pred=pred):
             return item
 
