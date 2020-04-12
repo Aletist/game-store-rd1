@@ -47,7 +47,7 @@ def decode_auth_token(auth_token, config):
     """
     secret_key = config['JWT_SECRET_KEY']
     try:
-        payload = jwt.decode(auth_token, secret_key)
+        payload = jwt.decode(auth_token, secret_key, algorithms='HS256')
         return payload['sub']
     except jwt.ExpiredSignatureError as error:
         raise ExpiredToken from error

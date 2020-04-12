@@ -55,7 +55,6 @@ class BaseModel(metaclass=ABCMeta):
 
 
 class Users(BaseModel):
-    # todo store password hash instead of raw string
     _fields = {'name', 'surname', 'email', 'is_active', 'password', 'username'}
 
     @property
@@ -69,6 +68,110 @@ class Users(BaseModel):
     @property
     def primary_field_name(self):
         return 'user_id'
+
+    def __init__(self):
+        super().__init__()
+        self._storage = {}
+
+
+class UserRoles(BaseModel):
+
+    _fields = {'user', 'role'}
+
+    @property
+    def storage(self):
+        return self._storage
+
+    @property
+    def fields(self):
+        return self._fields
+
+    @property
+    def primary_field_name(self):
+        return 'user-role_id'
+
+    def __init__(self):
+        super().__init__()
+        self._storage = {}
+
+
+class Roles(BaseModel):
+
+    _fields = {'name'}
+
+    @property
+    def storage(self):
+        return self._storage
+
+    @property
+    def fields(self):
+        return self._fields
+
+    @property
+    def primary_field_name(self):
+        return 'role_id'
+
+    def __init__(self):
+        super().__init__()
+        self._storage = {}
+
+
+class RolePermissions(BaseModel):
+
+    _fields = {'role', 'permission'}
+
+    @property
+    def storage(self):
+        return self._storage
+
+    @property
+    def fields(self):
+        return self._fields
+
+    @property
+    def primary_field_name(self):
+        return 'role-permission_id'
+
+    def __init__(self):
+        super().__init__()
+        self._storage = {}
+
+
+class Permissions(BaseModel):
+    _fields = {'name', 'resource', 'action'}
+
+    @property
+    def storage(self):
+        return self._storage
+
+    @property
+    def fields(self):
+        return self._fields
+
+    @property
+    def primary_field_name(self):
+        return 'permission_id'
+
+    def __init__(self):
+        super().__init__()
+        self._storage = {}
+
+
+class Resources(BaseModel):
+
+    _fields = {'name'}
+
+    @property
+    def storage(self):
+        return self._storage
+
+    @property
+    def fields(self):
+        return self._fields
+
+    @property
+    def primary_field_name(self):
+        return 'resource_id'
 
     def __init__(self):
         super().__init__()
