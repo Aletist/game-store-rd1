@@ -60,9 +60,10 @@ class UserSearcher(Resource):
 
     def get(self, key, value):
         try:
-            return [user for user
-                    in current_app.db['users'].storage.values()
-                    if user['is_active'] and user[key] == value]
+            return current_app.db['users'][key].fetchall(lambda x: x == value)
+            # return [user for user
+            #         in current_app.db['users'].storage.values()
+            #         if user['is_active'] and user[key] == value]
         except KeyError:
             abort(400)
 

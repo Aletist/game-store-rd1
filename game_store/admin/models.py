@@ -8,14 +8,17 @@ class SelectItem:
         self._field_name = field_name
 
     def query(self, pred):
-        return [value
-                for value in self._storage.values()
+        return {key:value
+                for (key, value) in self._storage.items()
                 if self._field_name in value
-                and pred(value[self._field_name])]
+                and pred(value[self._field_name])}
 
     def fetchone(self, pred):
-        for item in self.query(pred=pred):
+        for item in self.query(pred=pred).values():
             return item
+
+    def fetchall(self, pred):
+        return self.query(pred=pred).values()
 
 
 class BaseModel(metaclass=ABCMeta):
