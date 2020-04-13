@@ -7,7 +7,7 @@ def create_db():
         'users': Users(),
         'user-roles': UserRoles(),
         'roles': Roles(),
-        'role-permissions': RolePermissions(),
-        'permissions': Permissions(),
+        'role-perms': RolePermissions(),
+        'perms': Permissions(),
         'resources': Resources()
     }

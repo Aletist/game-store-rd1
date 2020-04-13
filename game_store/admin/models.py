@@ -121,7 +121,7 @@ class Roles(BaseModel):
 
 class RolePermissions(BaseModel):
 
-    _fields = {'role', 'permission'}
+    _fields = {'role', 'perm'}
 
     @property
     def storage(self):
@@ -141,7 +141,7 @@ class RolePermissions(BaseModel):
 
 
 class Permissions(BaseModel):
-    _fields = {'name', 'resource', 'action'}
+    _fields = {'resource', 'action'}
 
     @property
     def storage(self):
