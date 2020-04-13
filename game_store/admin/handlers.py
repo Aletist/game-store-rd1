@@ -93,7 +93,7 @@ class RoleHandler(Resource):
             'name': role['name'], 'permissions': permissions
         }
 
-    @auth.login_required()
+    @auth.login_required
     def put(self, role_name):
         current_app.auth_checker.check('Roles', 'update', g.user['user_id'])
         role = current_app.db['roles'].name.fetchone(lambda x: x == role_name)
@@ -105,7 +105,7 @@ class RoleHandler(Resource):
         except KeyError:
             abort(400)
 
-    @auth.login_required()
+    @auth.login_required
     def post(self, role_name):
         current_app.auth_checker.check('Roles', 'add', g.user['user_id'])
         data = {'name': role_name}
@@ -114,7 +114,7 @@ class RoleHandler(Resource):
 
 
 class RoleListHandler(Resource):
-    @auth.login_required()
+    @auth.login_required
     def get(self):
         current_app.auth_checker.check('Roles', 'list', g.user['user_id'])
         return list(current_app.db['roles'].values())
