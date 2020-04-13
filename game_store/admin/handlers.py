@@ -29,6 +29,7 @@ class UserHandler(Resource):
 
             for key in data.keys():
                 user[key] = data[key]
+            return '', 200
         except KeyError:
             abort(400)
 
@@ -38,7 +39,6 @@ class UserHandler(Resource):
         user = current_app.db['users'].get_by_id(user_id)
         user['is_active'] = False
         return '', 204
-
 
 
 class UserListHandler(Resource):
@@ -57,6 +57,7 @@ class UserListHandler(Resource):
             abort(409)
         current_app.db['users'].insert(data)
         return '', 201
+
 
 class UserRegisterHandler(Resource):
     def post(self):
@@ -78,11 +79,54 @@ class UserSearcher(Resource):
             abort(400)
 
 
+class RoleHandler(Resource):
+    @auth.login_required
+    def get(self, role_name):
+        current_app.auth_checker.check('Roles', 'read', g.user['user_id'])
+        role = current_app.db['roles'].name.fetchone(lambda x: x == role_name)
+        if not role:
+            abort(404)
+        perm_ids = [item['role-permission_id'] for item
+                    in current_app.db['role-perms'].name.fetchone(lambda x: x == role['role_id'])]
+        permissions = [current_app.db['perms'].get_by_id(id) for id in perm_ids]
+        return {
+            'name': role['name'], 'permissions': permissions
+        }
+
+    @auth.login_required()
+    def put(self, role_name):
+        current_app.auth_checker.check('Roles', 'update', g.user['user_id'])
+        role = current_app.db['roles'].name.fetchone(lambda x: x == role_name)
+        if not role:
+            abort(400)
+        try:
+            role['name'] = request.get_json()['new_name']
+            return '', 200
+        except KeyError:
+            abort(400)
+
+    @auth.login_required()
+    def post(self, role_name):
+        current_app.auth_checker.check('Roles', 'add', g.user['user_id'])
+        data = {'name': role_name}
+        current_app.db['roles'].insert(data)
+        return '', 201
+
+
+class RoleListHandler(Resource):
+    @auth.login_required()
+    def get(self):
+        current_app.auth_checker.check('Roles', 'list', g.user['user_id'])
+        return list(current_app.db['roles'].values())
+
+
 def register_handlers(app):
     api = Api(app)
     api.add_resource(UserHandler, '/user/<int:user_id>')
     api.add_resource(UserListHandler, '/users/')
     api.add_resource(UserRegisterHandler, '/register/')
     api.add_resource(UserSearcher, '/search/<key>/<value>')
+    api.add_resource(RoleHandler, '/role/<string:role_name>')
+    api.add_resource(RoleListHandler, '/roles>')
 
     return api
