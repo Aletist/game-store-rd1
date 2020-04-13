@@ -1,4 +1,4 @@
-from flask import Blueprint
+from flask import Blueprint, g
 from flask_restful import Api, Resource, abort
 
 from . import get_auth_token
@@ -12,6 +12,11 @@ class LoginHandler(Resource):
         except Exception:
             abort(404)
 
+class LogoutHandler():
+    def post(self):
+        g.user = None
+        return '', 200
+
 
 def register_handlers(app):
 
@@ -19,6 +24,7 @@ def register_handlers(app):
 
     api = Api(bp)
     api.add_resource(LoginHandler, '/login')
+    api.add_resource(LogoutHandler, '/logout')
 
     app.register_blueprint(bp)
 
