@@ -18,17 +18,28 @@ def config():
 def client(config):
     app = create_app('Test')
     app.config.from_mapping(config)
+    # todo: make something fancy here
     with app.test_client() as c:
-        c.application.db['users'].insert({'email': "admin@gov.ua", 'password': 'S3cPa55w0rd!'})
+        admin_user = {'email': "admin@gov.ua", 'password': 'S3cPa55w0rd!', 'is_active': True}
+        c.application.db['users'].insert(admin_user)
         c.application.db['roles'].insert({'name': 'admin'})
         c.application.db['user-roles'].insert({'user': 0, 'role': 0})
         c.application.db['resources'].insert({'name': 'Users'})
         c.application.db['perms'].insert({'resource': 0, 'action': 'read'})
+        c.application.db['perms'].insert({'resource': 0, 'action': 'list'})
+        c.application.db['perms'].insert({'resource': 0, 'action': 'add'})
+        c.application.db['perms'].insert({'resource': 0, 'action': 'update'})
+        c.application.db['perms'].insert({'resource': 0, 'action': 'delete'})
         c.application.db['role-perms'].insert({'role': 0, 'perm': 0})
+        c.application.db['role-perms'].insert({'role': 0, 'perm': 1})
+        c.application.db['role-perms'].insert({'role': 0, 'perm': 2})
+        c.application.db['role-perms'].insert({'role': 0, 'perm': 3})
+        c.application.db['role-perms'].insert({'role': 0, 'perm': 4})
+
         yield c
 
 
-@fixture()
+@fixture(scope='function')
 def token_auth(config):
     username = 'admin@gov.ua'
     token = encode_auth_token(username, config)
@@ -37,7 +48,7 @@ def token_auth(config):
     }
 
 
-@fixture()
+@fixture(scope='function')
 def user_data():
     return [{
         'name': 'Taras',
@@ -57,7 +68,7 @@ def user_data():
     }]
 
 
-@fixture()
+@fixture(scope='function')
 def role_data():
     return [{
         'name': 'admin'
@@ -68,7 +79,7 @@ def role_data():
     }]
 
 
-@fixture()
+@fixture(scope='function')
 def user_role_data():
     return [{
         'user': 1,
@@ -82,7 +93,7 @@ def user_role_data():
     }]
 
 
-@fixture()
+@fixture(scope='function')
 def users_db(user_data):
     users = Users()
     for u in user_data:

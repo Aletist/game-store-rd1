@@ -1,5 +1,5 @@
 from flask_restful import Resource, Api, abort
-from flask import current_app, request, g
+from flask import current_app, request, g, jsonify
 
 from ..auth import auth
 
@@ -18,7 +18,9 @@ class UserHandler(Resource):
         except KeyError:
             abort(404)
 
+    @auth.login_required
     def put(self, user_id):
+        current_app.auth_checker.check('Users', 'update', g.user['user_id'])
         data = request.get_json()
         try:
             user = current_app.db['users'].get_by_id(user_id)
@@ -30,28 +32,29 @@ class UserHandler(Resource):
         except KeyError:
             abort(400)
 
+    @auth.login_required
     def delete(self, user_id):
-        try:
-            user = current_app.db['users'].get_by_id(user_id)
-            user['is_active'] = False
-            return '', 204
-        except KeyError:
-            abort(400)
+        current_app.auth_checker.check('Users', 'delete', g.user['user_id'])
+        user = current_app.db['users'].get_by_id(user_id)
+        user['is_active'] = False
+        return '', 204
+
 
 
 class UserListHandler(Resource):
 
     @auth.login_required
     def get(self):
+        current_app.auth_checker.check('Users', 'list', g.user['user_id'])
         return current_app.db['users'].storage
 
 
-    # TODO implement error 409 when trying to add same user twice.
-    @auth.login_required
     def post(self):
         user_dict = request.get_json()
         data = user_dict['user']
         data['is_active'] = True
+        if current_app.db['users'].email.fetchone(lambda x: x == data['email']):
+            abort(409)
         current_app.db['users'].insert(data)
         return '', 201
 
@@ -60,10 +63,7 @@ class UserSearcher(Resource):
 
     def get(self, key, value):
         try:
-            return current_app.db['users'][key].fetchall(lambda x: x == value)
-            # return [user for user
-            #         in current_app.db['users'].storage.values()
-            #         if user['is_active'] and user[key] == value]
+            return list(getattr(current_app.db['users'], key).fetchall(lambda x: x == value))
         except KeyError:
             abort(400)
 
