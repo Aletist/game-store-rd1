@@ -127,6 +127,6 @@ def register_handlers(app):
     api.add_resource(UserRegisterHandler, '/register/')
     api.add_resource(UserSearcher, '/search/<key>/<value>')
     api.add_resource(RoleHandler, '/role/<string:role_name>')
-    api.add_resource(RoleListHandler, '/roles>')
+    api.add_resource(RoleListHandler, '/roles/')
 
     return api
