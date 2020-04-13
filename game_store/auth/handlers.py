@@ -12,7 +12,7 @@ class LoginHandler(Resource):
         except Exception:
             abort(404)
 
-class LogoutHandler():
+class LogoutHandler(Resource):
     def post(self):
         g.user = None
         return '', 200
