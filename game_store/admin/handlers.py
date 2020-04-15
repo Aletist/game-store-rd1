@@ -1,5 +1,5 @@
 from flask_restful import Resource, Api, abort
-from flask import current_app, request, g, jsonify
+from flask import current_app, request, g
 
 from ..auth import auth
 
@@ -49,17 +49,6 @@ class UserListHandler(Resource):
         return current_app.db['users'].storage
 
     @auth.login_required
-    def post(self):
-        user_dict = request.get_json()
-        data = user_dict['user']
-        data['is_active'] = True
-        if current_app.db['users'].email.fetchone(lambda x: x == data['email']):
-            abort(409)
-        current_app.db['users'].insert(data)
-        return '', 201
-
-
-class UserRegisterHandler(Resource):
     def post(self):
         user_dict = request.get_json()
         data = user_dict['user']
@@ -124,7 +113,6 @@ def register_handlers(app):
     api = Api(app)
     api.add_resource(UserHandler, '/user/<int:user_id>')
     api.add_resource(UserListHandler, '/users/')
-    api.add_resource(UserRegisterHandler, '/register/')
     api.add_resource(UserSearcher, '/search/<key>/<value>')
     api.add_resource(RoleHandler, '/role/<string:role_name>')
     api.add_resource(RoleListHandler, '/roles/')

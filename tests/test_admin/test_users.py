@@ -3,7 +3,7 @@ from unittest import mock
 
 def test_add_user(client, token_auth):
     user = {'name': "Vasyl", 'surname': "Goloborodko", 'email': "vova@gov.ua"}
-    r = client.post('/register/', json={'user': user})
+    r = client.post('/users/', json={'user': user}, headers=token_auth)
     status_code1 = r.status_code
 
     resp = client.get('/user/1', headers=token_auth)
@@ -12,7 +12,7 @@ def test_add_user(client, token_auth):
     expected.update({'user_id': mock.ANY})
     expected['is_active'] = True
 
-    r = client.post('/register/', json={'user': user})
+    r = client.post('/users/', json={'user': user}, headers=token_auth)
     status_code2 = r.status_code
     assert status_code1 == 201 and status_code2 == 409 and resp.json == expected
 
@@ -37,8 +37,7 @@ def test_list_users(client, token_auth):
     client.post('/users/', json={'user': user1}, headers=token_auth)
     client.post('/users/', json={'user': user2}, headers=token_auth)
 
-    admin_user = {'email': "admin@gov.ua", 'password': 'S3cPa55w0rd!', 'is_active': True}
-    admin_user['user_id'] = 0
+    admin_user = {'email': "admin@gov.ua", 'password': 'S3cPa55w0rd!', 'is_active': True, 'user_id': 0}
     user1['user_id'] = 1
     user2['user_id'] = 2
     user1['is_active'] = True
@@ -62,7 +61,7 @@ def test_delete_user(client, token_auth):
 def test_search_user(client, user_data, token_auth):
 
     for u in user_data:
-        client.post('/register/', json={'user': u})
+        client.post('/users/', json={'user': u}, headers=token_auth)
 
     resp = client.get('search/name/Ivan', headers=token_auth)
 
