@@ -19,16 +19,25 @@ def test_login_with_email_password(client):
     assert status_code == 200 and user_data == username
 
 
+def test_logout(client, token_auth):
+    resp = client.post('/logout', headers=token_auth)
+    status_code = resp.status_code
+
+    token = resp.json['token']
+    token_auth = {
+        'Authorization': b'Bearer ' + token.encode()
+    }
+    auth_resp = client.get('/users/', headers=token_auth)
+
+    assert status_code == 200 and auth_resp.status_code == 401
+
+
 def test_register_user(client):
     data = {
         'email': 'taras@shevchenko.name',
         'username': 'K0bz@r',
         'password': 'Zapovit2.0'
     }
-    # auth_str = base64.b64encode(':'.join([data['username'], data['password']]).encode("latin-1"))
-    # headers = {
-    #     'Authorization': b'Basic ' + auth_str
-    # }
     auth_resp = client.post('/register', json={'user': data})
     status_code = auth_resp.status_code
 

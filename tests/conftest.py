@@ -1,7 +1,6 @@
 from pytest import fixture
 
 from game_store.admin.app import create_app
-from game_store.admin.db import create_db
 from game_store.admin.models import Users
 from game_store.auth import encode_auth_token
 
@@ -100,10 +99,3 @@ def users_db(user_data):
         users.insert(u)
     return users
 
-#
-# @fixture()
-# def test_db(client, user_data, role_data):
-#     db = client.application.db
-#     for b in db:
-#         users.insert(u)
-#     return users

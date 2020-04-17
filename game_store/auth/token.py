@@ -14,13 +14,15 @@ class ExpiredToken(AuthError):
     pass
 
 
-def encode_auth_token(user_data, config):
+def encode_auth_token(user_data, config, is_logout=False):
     """
     Generates the Auth Token
     :return: string
     """
-    ttl_days = config.get('JWT_TTL_DAYS', 0)
+    ttl_days = -1 if is_logout else config.get('JWT_TTL_DAYS', 0)
     ttl_seconds = config.get('JWT_TTL_SECONDS', 0)
+
+
     secret_key = config['JWT_SECRET_KEY']
 
     now = dt.datetime.utcnow()

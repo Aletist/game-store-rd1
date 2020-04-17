@@ -6,7 +6,6 @@ class AuthChecker:
     def __init__(self, db):
         self._db = db
 
-    # todo: refactor this and catch only the specified exceptions.
     def check(self, resource, action, user_id):
         try:
             roles = [item['role']

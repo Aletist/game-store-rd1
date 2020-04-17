@@ -1,7 +1,7 @@
 from flask import Blueprint, g, request, current_app
 from flask_restful import Api, Resource, abort
 
-from . import get_auth_token, encode_auth_token
+from . import get_auth_token, encode_auth_token, auth
 
 
 class LoginHandler(Resource):
@@ -31,9 +31,12 @@ class UserRegisterHandler(Resource):
 
 
 class LogoutHandler(Resource):
+    @auth.login_required
     def post(self):
-        g.user = None
-        return '', 200
+        config = current_app.config
+
+        token = encode_auth_token(g.user['email'], config, True).decode()
+        return {'token': token}
 
 
 def register_handlers(app):
