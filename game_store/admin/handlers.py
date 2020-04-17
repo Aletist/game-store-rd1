@@ -106,15 +106,53 @@ class RoleListHandler(Resource):
     @auth.login_required
     def get(self):
         current_app.auth_checker.check('Roles', 'list', g.user['user_id'])
-        return list(current_app.db['roles'].values())
+        return current_app.db['roles'].values()
+
+
+class UserRoleHandler(Resource):
+
+    @auth.login_required
+    def get(self, username):
+        current_app.auth_checker.check('Users', 'list', g.user['user_id'])
+        current_app.auth_checker.check('Roles', 'list', g.user['user_id'])
+        role_ids = [item['role'] for item in current_app.db['user-roles'].user.fetchall(lambda x: x == username)]
+        roles = current_app.db['roles'].role_id.fetchall(lambda x: x in role_ids)
+
+        return {'username': username, 'roles': roles}
+
+
+    @auth.login_required
+    def put(self, username):
+        current_app.auth_checker.check('Users', 'edit', g.user['user_id'])
+        user = current_app.db['users'].name.fecthone(lambda x: x == username)['user_id']
+        roles_update = request.get_json('upd_roles')
+        for item in roles_update:
+            if not current_app.db['roles'].role_id.fetchone(lambda x: x == item['role']):
+                abort(400)
+
+            temp = None
+            for user_role in current_app.db['user-roles'].role.fetchall(lambda x: x == item['role']):
+                if user_role['user'] == username:
+                    temp = user_role
+                    break
+            if item['to_add']:
+                if temp:
+                    abort(409)
+                current_app.db['user-roles'].insert({'user': user, 'role': item['role']})
+            else:
+                try:
+                    del current_app.db['user-roles'][temp['user-role_id']]
+                except TypeError:
+                    pass
 
 
 def register_handlers(app):
     api = Api(app)
     api.add_resource(UserHandler, '/user/<int:user_id>')
-    api.add_resource(UserListHandler, '/users/')
+    api.add_resource(UserListHandler, '/users')
     api.add_resource(UserSearcher, '/search/<key>/<value>')
     api.add_resource(RoleHandler, '/role/<string:role_name>')
-    api.add_resource(RoleListHandler, '/roles/')
+    api.add_resource(RoleListHandler, '/roles')
+    api.add_resource(UserRoleHandler, '/user_roles/<string:username>')
 
     return api

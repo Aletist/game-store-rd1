@@ -27,7 +27,7 @@ def test_logout(client, token_auth):
     token_auth = {
         'Authorization': b'Bearer ' + token.encode()
     }
-    auth_resp = client.get('/users/', headers=token_auth)
+    auth_resp = client.get('/users', headers=token_auth)
 
     assert status_code == 200 and auth_resp.status_code == 401
 
