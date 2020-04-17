@@ -1,13 +1,13 @@
-from .models import *
+from . import models
 
 
 def create_db():
 
     return {
-        'users': Users(),
-        'user-roles': UserRoles(),
-        'roles': Roles(),
-        'role-perms': RolePermissions(),
-        'perms': Permissions(),
-        'resources': Resources()
+        'users': models.Users(),
+        'user-roles': models.UserRoles(),
+        'roles': models.Roles(),
+        'role-perms': models.RolePermissions(),
+        'perms': models.Permissions(),
+        'resources': models.Resources()
     }
