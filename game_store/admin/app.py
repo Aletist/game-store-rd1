@@ -11,7 +11,6 @@ from ..auth.permission import AuthChecker
 
 
 def create_app(name, config=None):
-
     app = Flask(name)
     if isinstance(config, typing.Mapping):
         try:
@@ -33,13 +32,10 @@ def create_app(name, config=None):
     return app
 
 
-def register_superuser_account(db):
-
-    pass
-
+def register_superuser_account(app, superuser):
+    app.db.update({'superuser': superuser})
 
 def read_yaml_config(config_fo):
-
     if config_fo is None:
         return
     with config_fo:
@@ -47,7 +43,6 @@ def read_yaml_config(config_fo):
 
 
 def validate_config(config):
-
     keys = ['JWT_SECRET_KEY']
     missing = []
     for key in keys:
@@ -58,20 +53,25 @@ def validate_config(config):
 
 
 def arg_parse(app_name, args=None):
-
     parser = argparse.ArgumentParser(app_name)
     parser.add_argument('--config', type=argparse.FileType(), default=None)
+    parser.add_argument('--root_name', type=str, default='root')
+    parser.add_argument('--root_email', type=str, default='root@gamestore.com')
+    parser.add_argument('--root_pwd', type=str, default='root')
 
     return parser.parse_args(args)
 
 
 def main(app_name='Game-Store'):
-
     args = arg_parse(app_name)
     config = read_yaml_config(args.config)
+    superuser = {'username': args.root_name,
+                 'password': args.root_pwd,
+                 'email': args.root_email,
+                 'user_id': -1}
     app = create_app(app_name, config=config)
 
-    register_superuser_account(app.db)
+    register_superuser_account(app, superuser)
 
     app.run(debug=True)
 

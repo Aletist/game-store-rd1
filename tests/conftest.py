@@ -1,6 +1,6 @@
 from pytest import fixture
 
-from game_store.admin.app import create_app
+from game_store.admin.app import create_app, register_superuser_account
 from game_store.admin.models import Users
 from game_store.auth import encode_auth_token
 
@@ -16,6 +16,10 @@ def config():
 @fixture(scope='function')
 def client(config):
     app = create_app('Test')
+    register_superuser_account(app, {'username': {'root'},
+                                     'password': {'root'},
+                                     'email': {'root@root.com'},
+                                     'user_id': -1})
     app.config.from_mapping(config)
     # todo: make something fancy here
     with app.test_client() as c:
@@ -98,4 +102,3 @@ def users_db(user_data):
     for u in user_data:
         users.insert(u)
     return users
-

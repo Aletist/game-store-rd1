@@ -135,7 +135,7 @@ class UserRoleHandler(Resource):
                 if user_role['user'] == username:
                     temp = user_role
                     break
-            if item['to_add']:
+            if item['is_to_add']:
                 if temp:
                     abort(409)
                 current_app.db['user-roles'].insert({'user': user, 'role': item['role']})
